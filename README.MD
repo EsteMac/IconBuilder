@@ -1,7 +1,7 @@
-# Headline2Img
+# IconBuilder
 
 ## Introduction
-Headline2Img is a Streamlit application that generates images based on user-provided news headlines using Azure's DALL-E 3 API. It offers an interactive UI where users can input a headline, choose image generation parameters (size, quality, style), and receive a visually generated image corresponding to the headline.
+IconBuilder is a Streamlit application that generates app icons based on user-provided app names using Azure's DALL-E 3 API. It offers an interactive UI where users can input an app name, choose image generation parameters (quality, style), and receive a visually generated icon corresponding to the app name.
 
 ## Prerequisites
 - Python 3.8 or higher
@@ -10,12 +10,16 @@ Headline2Img is a Streamlit application that generates images based on user-prov
 
 ## Setup
 1. **Clone the repository**:
-git clone https://github.com/estevan-mccalley/Headline2Img.git
-cd Headline2Img
+```
+git clone https://github.com/EsteMac/IconBuilder
+cd IconBuilder
+```
 
 2. **Create a virtual environment** (optional but recommended):
+```
 python -m venv venv
 source venv/bin/activate # On Windows use venv\Scripts\activate
+```
 
 3. **Install required packages**:
 pip install -r requirements.txt
@@ -32,11 +36,11 @@ pip install -r requirements.txt
 Run the Streamlit application with:
 streamlit run main.py
 
-Navigate to the provided URL in your web browser to interact with the application. You can enter news headlines, select image generation parameters, and generate images based on your inputs. Example headlines are provided for quick demonstrations, and a "Reset" button is available to clear inputs and generated images.
+Navigate to the provided URL in your web browser to interact with the application. You can enter app names, select image generation parameters, and generate icons based on your inputs. Example app names are provided for quick demonstrations, and a "Reset" button is available to clear inputs and generated images.
 
 ## Features
-- **Customizable Image Generation**: Choose between different sizes, qualities, and styles for the generated images.
-- **Example Headlines**: Quickly generate images using pre-defined example headlines.
+- **Customizable Icon Generation**: Choose between qualities and styles for the generated icons.
+- **Example App Names**: Quickly generate icons using pre-defined example app names.
 - **Interactive UI**: Streamlit-based UI for an intuitive user experience.
 
 ## Disclaimer

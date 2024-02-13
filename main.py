@@ -3,23 +3,27 @@ from openai import AzureOpenAI  # Import client for Azure OpenAI
 import streamlit as st
 from dotenv import load_dotenv
 
-load_dotenv()  # take environment variables from .env.
+load_dotenv()  # Take environment variables from .env.
 
 # Get API key and endpoint from environment variable
 AZURE_OPENAI_DALLE3_API_KEY = os.getenv("AZURE_OPENAI_DALLE3_API_KEY")
 AZURE_OPENAI_API_ENDPOINT_DALLE3 = os.getenv("AZURE_OPENAI_API_ENDPOINT_DALLE3")
 
 # Function to query Azure DALL-E 3 for an image
-def query_azure_dalle_for_image(title, api_key, api_endpoint, size, quality, style):
+def query_azure_dalle_for_image(app_name, api_key, api_endpoint, quality, style):
+    # Hardcoded size as per the requirement
+    size = "1024x1024"
     client = AzureOpenAI(
         api_key=api_key,  
         api_version="2023-12-01-preview",
         azure_endpoint=api_endpoint
     )
+    # Updated prompt with the system instruction and appending app_name
+    prompt = f"Rounded edges square mobile app logo design without text, 3d origami of a '{app_name}' GPT, subtle gradient, minimal blue background. Conveys the idea of the APPLICATION NAME: '{app_name}'"
     try:
         response = client.images.generate(
             model="dalle-3",
-            prompt=title,
+            prompt=prompt,
             size=size,
             quality=quality,
             style=style,
@@ -33,16 +37,11 @@ def query_azure_dalle_for_image(title, api_key, api_endpoint, size, quality, sty
 
 # Main Streamlit app
 def main():
-    st.title("Headline2Img: DALL-E 3 Image Generator")
+    st.title("IconBuilder: DALL-E 3 Icon Generator")
+    st.subheader("Please be patient after every submission")
     
     # Sidebar for model parameters with tooltips
     st.sidebar.header("Model Parameters")
-    size = st.sidebar.selectbox(
-        "Size", 
-        ["1024x1024", "1024x1792", "1792x1024"], 
-        index=0, 
-        help="DALL-E 3 was trained to generate 1024x1024, 1024x1792 or 1792x1024 images"
-    )
     quality = st.sidebar.selectbox(
         "Quality", 
         ["standard", "hd"], 
@@ -64,37 +63,37 @@ def main():
                 del st.session_state[key]
         st.experimental_rerun()
 
-    example_headlines = [
-        "Futuristic Cityscape: A Vision of 2100",
-        "Deep Sea Discoveries: New Species Unveiled",
-        "Quantum Computing: Breaking the Speed Barrier",
-        "Mars Colonization: First Human Settlement"
+    example_icons = [
+        "IntelliPrompt",
+        "SmartChat",
+        "Headline2Image",
+        "IconBuilder"
     ]
     
-    st.header("Example Headlines")
+    st.header("Example App Icons")
     col1, col2, col3, col4 = st.columns(4)
     columns = [col1, col2, col3, col4]
     
-    for i, headline in enumerate(example_headlines):
-        if columns[i % 4].button(headline):
-            st.session_state.title = headline  # Save the chosen headline in session state
-            # Generate image for the chosen headline
-            image_url = query_azure_dalle_for_image(headline, AZURE_OPENAI_DALLE3_API_KEY, AZURE_OPENAI_API_ENDPOINT_DALLE3, size, quality, style)
+    for i, icon in enumerate(example_icons):
+        if columns[i % 4].button(icon):
+            st.session_state.title = icon  # Save the chosen icon in session state
+            # Generate icon for the chosen app name
+            image_url = query_azure_dalle_for_image(icon, AZURE_OPENAI_DALLE3_API_KEY, AZURE_OPENAI_API_ENDPOINT_DALLE3, quality, style)
             if image_url:
                 st.session_state.image_url = image_url  # Save the image URL in session state
 
-    # User input for the news headline
-    title = st.text_input("Or provide your own headline:", value="", key="title")
+    # User input for the app icon
+    icon = st.text_input("Or provide your own app name:", value="", key="icon")
     
-    if st.button("Generate Image"):
-        if title:
-            image_url = query_azure_dalle_for_image(title, AZURE_OPENAI_DALLE3_API_KEY, AZURE_OPENAI_API_ENDPOINT_DALLE3, size, quality, style)
+    if st.button("Generate Icon"):
+        if icon:
+            image_url = query_azure_dalle_for_image(icon, AZURE_OPENAI_DALLE3_API_KEY, AZURE_OPENAI_API_ENDPOINT_DALLE3, quality, style)
             if image_url:
                 st.session_state.image_url = image_url  # Save the image URL in session state
 
     # Display the image if available
     if "image_url" in st.session_state and st.session_state.image_url:
-        st.image(st.session_state.image_url, caption="Generated Image")
+        st.image(st.session_state.image_url, caption="Generated Icon")
 
 if __name__ == "__main__":
     main()
