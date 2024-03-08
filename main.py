@@ -1,35 +1,29 @@
-import os
-from openai import AzureOpenAI  # Import client for Azure OpenAI
+import requests
 import streamlit as st
-from dotenv import load_dotenv
-
-load_dotenv()  # Take environment variables from .env.
-
-# Get API key and endpoint from environment variable
-AZURE_OPENAI_DALLE3_API_KEY = os.getenv("AZURE_OPENAI_DALLE3_API_KEY")
-AZURE_OPENAI_API_ENDPOINT_DALLE3 = os.getenv("AZURE_OPENAI_API_ENDPOINT_DALLE3")
 
 # Function to query Azure DALL-E 3 for an image
-def query_azure_dalle_for_image(app_name, api_key, api_endpoint, quality, style):
-    # Hardcoded size as per the requirement
-    size = "1024x1024"
-    client = AzureOpenAI(
-        api_key=api_key,  
-        api_version="2023-12-01-preview",
-        azure_endpoint=api_endpoint
-    )
+def query_azure_dalle_for_image(app_name, quality, style):
+    endpoint ='https://accels-api.tfcdev.thermofisher.net/aclgate/chat/dalle3'
+    headers = {
+        'Content-Type': 'application/json',
+    }
     # Updated prompt with the system instruction and appending app_name
     prompt = f"Rounded edges square mobile app logo design without text, 3d origami of a '{app_name}' GPT, subtle gradient, minimal blue background. Conveys the idea of the APPLICATION NAME: '{app_name}'"
+
     try:
-        response = client.images.generate(
-            model="dalle-3",
-            prompt=prompt,
-            size=size,
-            quality=quality,
-            style=style,
-            n=1,  # Number of images to generate
-        )
-        image_url = response.data[0].url  
+        data = {
+            "prompt": prompt,
+            "size": "1024x1024",
+            "n": 1,
+            "quality": quality,
+            "style": style
+        }
+        response = requests.post(endpoint, headers=headers, json=data)
+        response_json = response.json()  # This converts the JSON response to a Python dictionary
+        print(response_json)
+
+        # Accessing the URL from the nested dictionary structure
+        image_url = response_json['data'][0]['url']
         return image_url
     except Exception as e:
         st.error(f"An error occurred during Azure DALL-E 3 query: {e}")
@@ -78,7 +72,7 @@ def main():
         if columns[i % 4].button(icon):
             st.session_state.title = icon  # Save the chosen icon in session state
             # Generate icon for the chosen app name
-            image_url = query_azure_dalle_for_image(icon, AZURE_OPENAI_DALLE3_API_KEY, AZURE_OPENAI_API_ENDPOINT_DALLE3, quality, style)
+            image_url = query_azure_dalle_for_image(icon, quality, style)
             if image_url:
                 st.session_state.image_url = image_url  # Save the image URL in session state
 
@@ -87,7 +81,7 @@ def main():
     
     if st.button("Generate Icon"):
         if icon:
-            image_url = query_azure_dalle_for_image(icon, AZURE_OPENAI_DALLE3_API_KEY, AZURE_OPENAI_API_ENDPOINT_DALLE3, quality, style)
+            image_url = query_azure_dalle_for_image(icon, quality, style)
             if image_url:
                 st.session_state.image_url = image_url  # Save the image URL in session state
 
